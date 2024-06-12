@@ -12,7 +12,7 @@ func main() {
 	//input()
 	//checkMethod()
 	//multiReturn()
-
+	constTest()
 }
 
 func hello() {
@@ -137,4 +137,28 @@ func multiFun(a int, b int) (sr int, sb bool) {
 		sb = false
 	}
 	return
+}
+
+func constTest() {
+	//상수라는 개념이 존재한다
+	const a = 1
+	//a = 2 < compile error
+	const b int = 2
+	//b = 3 < compile error
+	fmt.Println(a + b)
+
+	//상수는 한꺼번에 선언이 가능하다(var 는 불가)
+	//+iota 라는 키워드를 사용해서 괄호 범위 내에서 자동으로 증가하는 키워드를 사용할 수 있음(var는 불가)
+	//+const() 을 사용해서 여러개의 상수를 선언할 때 첫번쨰 인자에만 변수를 적어주고 초기값이 동일하게
+	//상수 같은 경우에도 var 에서 선언한 것 처럼 타입이 필수는 아님
+	const (
+		q = iota + 1
+		w
+		e
+		r
+	)
+	fmt.Printf("q: %v \n", q)
+	fmt.Printf("w: %v \n", w)
+	fmt.Printf("e: %v \n", e)
+	fmt.Printf("r: %v \n", r)
 }
