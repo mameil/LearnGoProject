@@ -9,7 +9,10 @@ func main() {
 	//variable1()
 	//variable2()
 	//printTest()
-	input()
+	//input()
+	//checkMethod()
+	//multiReturn()
+
 }
 
 func hello() {
@@ -38,7 +41,9 @@ func variable2() {
 	var b int     //(var + 변수명 + 변수의 타입 + (초기값이 없으면 타입별 기본값으로 대체)) >> int 의 초기값은 0 이구나
 	var c = 4     //(var + 변수명 + (변수의 타입은 초기값을 기반으로 타입이 지정) + 초기값)
 	d := 3        //:= 을 사용하면 var 없이 초기값만을 통해서 해당 변수의 타입, 초기값을 지정할 수 있음
+	var isAble bool = true
 	fmt.Println(a + b + c + d)
+	fmt.Println(isAble)
 	fmt.Println("=========================================")
 
 	/**
@@ -101,4 +106,35 @@ func input() {
 	//아래를 실행하고 1을 입력 후 엔터를 쳐보면 scanln 이 종료되고 입력받은 1은 a 에 할당되고 c는 할당받지 못한 상태로 그냥 기본값인 0 이 더해진다
 	fmt.Scanln(&a, &c)
 	fmt.Println(a + c)
+}
+
+func checkMethod() {
+	a := 3
+	b := 4
+	fmt.Println("=============================================")
+	fmt.Println(myAdd(myAdd(a, b), 3))
+	fmt.Println("=============================================")
+}
+
+func myAdd(a int, b int) int {
+	return a + b
+}
+
+func multiReturn() {
+	//go 에서는 함수에서 여러개의 값을 리턴하는 것이 가능하다..!
+	sum, zeroAble := multiFun(1, -1)
+	fmt.Println(sum, zeroAble)
+}
+
+// 리턴값이 여러개일 때는 리턴타입들을 소괄호로 묶어서 표현한다 @see multiFun
+// 리턴하는 값에 변수명을 설정하는 것이 가능하다
+// 리턴하는 값에 변수명을 붙힐 때는 붙힐꺼면 다 붙히고 안붙힐꺼면 다 안붙히고 둘중 하나만 해야함
+func multiFun(a int, b int) (sr int, sb bool) {
+	sr = a + b
+	if a+b == 0 {
+		sb = true
+	} else {
+		sb = false
+	}
+	return
 }
