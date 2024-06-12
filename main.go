@@ -12,7 +12,8 @@ func main() {
 	//input()
 	//checkMethod()
 	//multiReturn()
-	constTest()
+	//constTest()
+	ifTest()
 }
 
 func hello() {
@@ -161,4 +162,35 @@ func constTest() {
 	fmt.Printf("w: %v \n", w)
 	fmt.Printf("e: %v \n", e)
 	fmt.Printf("r: %v \n", r)
+}
+
+func ifTest() {
+	//go 에서 if 문을 사용하는데 있어서 특이한점은 if 내에 들어가는 조건문이 간단하면 () 괄호 없이 if ~ 이렇게 만 작성하고도 수행이 가능하다
+	if 2 > 1 {
+		fmt.Println("IF 문 정상 수행")
+	} else {
+		fmt.Println("ELSE 문 정상 수행")
+	}
+
+	//go 에서 if 문의 특이한점은 if 문에 초기값을 넣어줄 수 있다는 점 >> 이해가 잘 안갔는데
+	//간단하게 설명해보면 if 문을 특정 함수의 수행 여부에 따라서 수행되게 할 수 있다는 점
+	if ipt, isPlus := checkPlus(9999); ipt == 9999 && isPlus {
+		fmt.Println("ipt 값이 양수이고 그 값은 ", ipt, "이다")
+	} else {
+		fmt.Println("이상한 값")
+	}
+
+	if ipt, isPlus := checkPlus(-1234); isPlus {
+		fmt.Println("ipt 값이 양수이고 그 값은 ", ipt, "이다")
+	} else {
+		fmt.Println("ipt 값이 음수이고 그 값은 ", ipt, "이다")
+	}
+}
+
+func checkPlus(ipt int) (int, bool) {
+	if ipt >= 0 {
+		return ipt, true
+	} else {
+		return ipt, false
+	}
 }
