@@ -13,7 +13,8 @@ func main() {
 	//checkMethod()
 	//multiReturn()
 	//constTest()
-	ifTest()
+	//ifTest()
+	switchTest()
 }
 
 func hello() {
@@ -193,4 +194,27 @@ func checkPlus(ipt int) (int, bool) {
 	} else {
 		return ipt, false
 	}
+}
+
+func switchTest() {
+	//go 에서 switch 문을 사용하는데 있어서 특이한 점은 if 문과 동일하게 조건문이 간단하면 () 괄호 없이 switch ~ 이렇게 만 작성하고도 수행이 가능하다
+	//추가적으로 switch 에서도 초기값을 넣어주는 것이 가능하다
+	//;(세미콜론) 전에 초기값을 설정하는 로직을 쭉 작성해주고 ; 으로 초기값 설정 로직 종료시키고
+	//뒤에 변수를 입력하면 switch(변수)~~ 이렇게 변수에 대한 switch 가 수행되는거고
+	//뒤에 변수를 입력하지 않으면 조건문으로 수행되는 switch 문이 수행된다고 보면 된다
+	//추가로 switch 문을 사용하는데 있어서 break 을 걸지 않아도 자동으로 case 하나 수행하면 빠져나온다 > 자바에서는 케이스에 걸렸을 때 break 가 있으면 내려가면서 다 수행하는디
+	switch age := getAge(); {
+	case age >= 20:
+		fmt.Println("사용자의 나이는 20대 입니다")
+	case age >= 10:
+		fmt.Println("사용자의 나이는 10대인데 switch 문 특성상 여기까진 않올 듯")
+	default:
+		{
+			fmt.Println("여기까지 도달하다니.. 대단하군")
+		}
+	}
+}
+
+func getAge() int {
+	return 28
 }
