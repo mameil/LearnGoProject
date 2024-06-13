@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -14,7 +16,10 @@ func main() {
 	//multiReturn()
 	//constTest()
 	//ifTest()
-	switchTest()
+	//switchTest()
+	//forTest()
+	//forTest2()
+	forTest3()
 }
 
 func hello() {
@@ -234,5 +239,105 @@ func forTest() {
 	조건문만 있는 경우
 	이렇게 경우의 수가 몇가지가 있는데 각각의 경우는 필요시에 사용하면 될 것 같구 사용빈도가 굉장히 낮을 것으로 예상
 	*/
+}
 
+func forTest2() {
+	/*
+		이외에도 다른 프로그램 언어와 동잃하게
+			continue > 바로 다음 단계의 루프로 진행
+			break > 진행하고 있는 루프를 종료
+			이러한 키워드들이 존재
+	*/
+
+	//짝수를 받을때 까지 계속해서 입력을 받고,
+	//숫자가 아닌 입력이 들어오면 "숫자를 입력하세요" 라는 문구가 나오고
+	//홀수인 입력이 들어오면 "$입력값 은 홀수입니다" 라는 문구를 보여주고
+	//짝수인 입력이 들어오면 "$입력값 은 짝수입니다" 라는 문구를 보여주고 루프를 종료하는 함수
+
+	stdin := bufio.NewReader(os.Stdin)
+	for { //for 문에서 따로 초기값, 조건값, 증감값 선언을 안해주면 기본적으로 무한루프로 판단
+		fmt.Println("값을 입력해주세요")
+		var num int
+		_, err := fmt.Scan(&num)
+		if err != nil {
+			fmt.Println("숫자를 입력하셔야 합니다")
+			//scan 과 같은 입력함수는 Buffer(입력 데이터를 임시로 저장하는 메모리 영역)에 저장되고 이걸 프로그램이 읽는 방식
+			//현재 코드를 기준으로 scan 은 Buffer 에 올라가있는 값에서 숫자만 뽑아서 읽도록 되어있는데
+			//숫자 + 엔터 를 통해서 입력을 했기 떄문에 버퍼에는 숫자 + 엔터로 구성되어있고 여기서 숫자만 뽑고 엔터가 남아있는 상황임
+			//그래서 ReadString('\n') 을 해주지 않으면(아래에 실제로 테스트해봄) 자동으로 공백을 읽어가면서 수행된다
+			stdin.ReadString('\n')
+			continue
+		}
+
+		if num%2 == 0 {
+			fmt.Println("입력하신 숫자", num, "은 짝수입니다")
+			break
+		} else {
+			fmt.Println("입력하신 숫자", num, "은 홀수입니다")
+		}
+	}
+
+	//버퍼에서 공백을 빼주는 작업이 없는 경우
+	//for {
+	//	fmt.Println("값을 입력해주세요")
+	//	var num int
+	//	_, err := fmt.Scan(&num)
+	//	if err != nil {
+	//		fmt.Println("숫자를 입력해주세요")
+	//		continue
+	//	}
+	//
+	//	if num%2 == 0 {
+	//		fmt.Println("입력하신 숫자", num, "은 짝수입니다")
+	//		break
+	//	} else {
+	//		fmt.Println("입력하신 숫자", num, "은 홀수입니다")
+	//	}
+	//}
+
+	//값을 입력해주세요
+	//vv
+	//숫자를 입력해주세요
+	//값을 입력해주세요
+	//숫자를 입력해주세요
+	//값을 입력해주세요
+
+	//값을 vv+엔터 이렇게 입력하면
+	//프로그램에서는 vv 을 도출해서 수행이되면서 "숫자를 입력해주세요" 가 나올꺼고
+	//continue 를 통해서 다시 "값을 입력해주세요" 가 나올꺼고
+	//버퍼에서 남은 공백을 자동으로 추출해서 프로그램이 수행되니까 "숫자를 입력해주세요" 가 나올꺼고
+	//continue 를 통해서 다시 "값을 입력해주세요" 가 나올꺼고
+}
+
+func forTest3() {
+	//이중 루프를 사용해서 별을 찍어본다
+	//별을 기준으로 피라미드를 세워본다 입력값을 높이를 기준으로 수행됨 + 입력값은 숫자가 이쁠듯
+	for {
+		var num int
+		fmt.Println("그리고 싶은 피라미드의 너비 사이즈를 입력하세요\n종료하시고 싶으시면 0 을 입력해주세요")
+		_, err := fmt.Scan(&num)
+		if err != nil {
+			fmt.Println("숫자를 입력해주셔야 합니다")
+			continue
+		} else if num == 0 {
+			fmt.Println("루프를 종료합니다...")
+			break
+		} else if num%2 == 0 {
+			fmt.Println("숫자는 짝수를 입력해주셔야 합니다")
+			continue
+		}
+
+		for i := 1; i <= num; i += 2 {
+			for j := 0; j < (num-i)/2; j++ {
+				fmt.Print(" ")
+			}
+			for j := 0; j < i; j++ {
+				fmt.Print("*")
+			}
+			for j := 0; j < (num-i)/2; j++ {
+				fmt.Print(" ")
+			}
+			fmt.Println()
+		}
+	}
 }
