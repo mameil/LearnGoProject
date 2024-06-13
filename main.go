@@ -19,7 +19,8 @@ func main() {
 	//switchTest()
 	//forTest()
 	//forTest2()
-	forTest3()
+	//forTest3()
+	arrayTest()
 }
 
 func hello() {
@@ -340,4 +341,52 @@ func forTest3() {
 			fmt.Println()
 		}
 	}
+}
+
+func arrayTest() {
+	//배열의 생김새가 이상하다
+	//[사이즈]타입{} 형식으로 배열을 초기화 시켜줄 수 있음
+	var _ [3]int
+	_ = [3]int{}
+
+	//배열을 선언하면서 배열의 구성도 한꺼번에 구성할 수 있음
+	//len() 함수를 사용해서 배열의 사이즈를 구하는 것이 가능
+	var myArray = [5]int{1, 2, 3, 4, 5}
+	for i := 0; i < len(myArray); i++ {
+		fmt.Println(myArray[i])
+	}
+
+	//이렇게 특정 index 부분에만 값을 넣고 나머지는 default 값으로 설정되게끔도 가능
+	initArray := [3]string{0: "a", 2: "c"}
+	fmt.Println(initArray[0]) //a
+	fmt.Println(initArray[1]) //공백
+	fmt.Println(initArray[2]) //c
+
+	//배열의 사이즈를 정하지 않고 배열을 선언하는 것도 가능
+	//but 초기화 시 배열을 구성한 값들을 기반으로 배열의 사이즈를 측정하기 떄문에 참고
+	sizeArray := [...]int{0: 1, 1: 2, 3: 4}
+	fmt.Println(sizeArray)      //배열의 print 가 이쁘게 잘나오네...
+	fmt.Println(len(sizeArray)) //4
+
+	//배열의 사이즈를 선언하는데 있어서 숫자를 변수로 설정할 수도 있지만 >>> 상수로 설정된 변수를 사이즈에 넣을 수 있음
+	const TEST_SIZE = 3
+	constArray := [TEST_SIZE]int{1, 2, 3}
+	fmt.Println(constArray)
+
+	//배열을 순회하는 방법으로 range 키워드를 사용할 수 있음
+	//range 을 사용하게 되면 i(인덱스값), v(인덱스에 들어있는 값) 이렇게 도출된다
+	for i, v := range myArray {
+		fmt.Println(i, ":", v)
+	}
+
+	//만약에 인덱스 값이 필요없거나 인덱스에 맞는 value 값이 필요없으면 _ 을 통해서 무시해주는 것도 가능
+	for _, v := range myArray {
+		fmt.Println(v, ":", v)
+	}
+
+	multiArray := [2][2]int{{1, 2}, {3, 4}}
+	fmt.Println(multiArray)
+	//배열의 메모리 사이즈는 배열의 크기 * 배열의 구성 타입 사이즈
+	//ex) multiArray > 2 * 2 * 8(int사이즈)
+
 }
