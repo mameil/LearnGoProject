@@ -48,4 +48,36 @@ func main() {
 	stringer = student2 //만약에 interface 에 구현한 메소드를 안적어두고 이렇게 interface 에 struct 를 넣어주면 "메소드 구현해!" 라고 에러가 발생하니까 같이 만들어주면 됨
 	fmt.Println(stringer.String())
 
+	/**
+	인터페이스를 사용하는 이유
+	인터페이스를 이용하면 구체화된 객체가 아닌 인터페이스만을 가지고 메소드를 호출하는 것이 가능하고, 수정이 필요해도 인터페이스만 수정하면 되기 때문에 유지보수가 편리해짐
+	*/
+
+	koreanPostSender := &PostSender{}
+	SendBook("어린왕자", koreanPostSender)
+	SendBook("그리스인 조르바", koreanPostSender)
+
+	fedexSender := &FedexSender{}
+	SendBook("어린왕자", fedexSender)
+	SendBook("그리스인 조르바", fedexSender)
+}
+
+type Sender interface {
+	Send(parcel string)
+}
+
+func SendBook(name string, sender Sender) {
+	sender.Send(name)
+}
+
+type FedexSender struct{}
+
+func (f *FedexSender) Send(parcel string) {
+	fmt.Println("Fedex sent", parcel)
+}
+
+type PostSender struct{}
+
+func (f *PostSender) Send(parcel string) {
+	fmt.Println("Post sent", parcel)
 }
