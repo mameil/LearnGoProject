@@ -37,6 +37,28 @@ func (s Student3) String() string {
 	return fmt.Sprintf("Name : %s, Age : %d", s.Name, s.Age)
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+
+type Sender interface {
+	Send(parcel string)
+}
+
+func SendBook(name string, sender Sender) {
+	sender.Send(name)
+}
+
+type FedexSender struct{}
+
+func (f *FedexSender) Send(parcel string) {
+	fmt.Println("Fedex sent", parcel)
+}
+
+type PostSender struct{}
+
+func (f *PostSender) Send(parcel string) {
+	fmt.Println("Post sent", parcel)
+}
+
 func main() {
 	student := Student3{Name: "shim", Age: 28} //implement 받고 싶은 struct 을 생성
 	student2 := Student3By{Name: "kyudo", Age: 27}
@@ -60,24 +82,72 @@ func main() {
 	fedexSender := &FedexSender{}
 	SendBook("어린왕자", fedexSender)
 	SendBook("그리스인 조르바", fedexSender)
+
+	/**
+	추상화 계층이란
+	내부 동작을 감춰서 서비스를 제공하는 쪽과 사용하는 쪽 모두에게 자유를 주는 방식
+	위의 koreanPostSender, fedexSender 모두 인터페이스를 통한 추상화로 인해 > 사용자는 아무런 생각없이 그냥 SendBook 메소드만 사용하고 객체만 잘 넣어주면 알아서 맞게 동작하는걸 봄
+	*/
+
+	/**
+	추가적인 인터페이스 기능(아래)
+	- 포함된 인터페이스
+	- 빈 인터페이스
+	- 인터페이스 디폴트값 >> 기본값은 유효하지 않은 메모 주소를 나타내는 nil 임
+	*/
+	PrintVal(10)
+	PrintVal(3.14)
+	PrintVal("Hello")
+	PrintVal(Student4{15})
 }
 
-type Sender interface {
-	Send(parcel string)
+////////////////////////////////////////////////////////////////////////////////////
+/**
+인터페이스 속 인터페이스
+구조체 안에서 구조체를 포함한 필드를 가질 수 있듯이, 인터페이스 안에서도 인터페이스를 가질 수 있음
+*/
+type Reader interface {
+	Read() (n int, err error)
+	Close() error
 }
 
-func SendBook(name string, sender Sender) {
-	sender.Send(name)
+type Writer interface {
+	Write() (n int, err error)
+	Close() error
 }
 
-type FedexSender struct{}
-
-func (f *FedexSender) Send(parcel string) {
-	fmt.Println("Fedex sent", parcel)
+type ReadWriter interface {
+	Reader
+	Writer
 }
 
-type PostSender struct{}
+/**
+이렇게 되어있는 상황에서
+Read(), Write(), Close() 메소드를 모두 가지고 있는 타입은, Reader, Writer, ReadWriter 모두 사용이 가능
+Read(), Close() 메소드를 모두 가지고 있는 타입은 Reader 만 사용 가능
+Write(), Close() 메소드를 모두 가지고 있는 타입은 Writer 만 사용 가능
+Read(), Write() 메소드를 모두 가지고 있는 타입은 Close() 메소드가 없기(구현안했기) 때문에 Reader, Writer 둘 다 사용할 수 없음
+*/
 
-func (f *PostSender) Send(parcel string) {
-	fmt.Println("Post sent", parcel)
+////////////////////////////////////////////////////////////////////////////////////
+/**
+interface { }
+위처럼 선언해주면, 메소드를 가지지 않은 빈 인터페이스라고 볼 수 있다
+이걸 언제쓰냐? > 어떤 값이든 받을 수 있는 함수, 메소드, 변숫값을 만들 때 사용
+*/
+func PrintVal(v interface{}) {
+	switch t := v.(type) {
+	case int:
+		fmt.Println("int : ", int(t))
+	case float64:
+		fmt.Println("float64 : ", float64(t))
+	case string:
+		fmt.Println("string : ", string(t))
+	default:
+		fmt.Println("Not supported type")
+	}
+}
+
+type Student4 struct {
+	Age int
 }
