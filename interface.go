@@ -99,6 +99,16 @@ func main() {
 	PrintVal(3.14)
 	PrintVal("Hello")
 	PrintVal(Student4{15})
+
+	/**
+	인터페이스 변환
+	인터페이스 변수를 타입 변환을 통해서 구체화된 다른 타입이나 다른 인터페이스로 변환 가능
+	+ 인터페이스 <> 인터페이스도 가능 << 이 케이스에는 타입 변환시, 변환성공 여부도 확인가능하다
+	ex) t, ok := a.(T)
+	t 는 변환된 값, ok 는 변환 결과값
+	*/
+	s := &myStudent{15}
+	PrintAge(s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -150,4 +160,21 @@ func PrintVal(v interface{}) {
 
 type Student4 struct {
 	Age int
+}
+
+type myStringer interface {
+	String() string
+}
+
+type myStudent struct {
+	Age int
+}
+
+func (s *myStudent) String() string {
+	return fmt.Sprintf("Age : %d", s.Age)
+}
+
+func PrintAge(myStringer myStringer) {
+	s := myStringer.(*myStudent) //,(타입) 으로 타입 변환을 해줄 수 있음
+	fmt.Println(s.Age)
 }
