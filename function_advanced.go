@@ -53,6 +53,20 @@ func main() {
 	fmt.Println(operator(3, 4))  //7
 	fmt.Println(operator2(3, 4)) //12
 
+	//4. 함수 리터럴
+	//함수 리터럴이란, 이름 없는 함수로 함수명을 따로 적지 않고 함수 타입 변수값으로 대압되는 함수값을 의미한다
+	//aka 익명 함수 / 람다
+
+	//실제로 함수 리터럴을 사용해서 함수를 호출하는 예시(getOperator2 참고)
+	fn := getOperator("*")
+	result := fn(3, 4)
+	fmt.Println(result)
+
+	//함수 리터럴 ㅚ부 변수를 내부 상태로 가져오는 것을 캡쳐라고 한다
+	//챕쳐는 결국 값을 복사해서 사용하는 개념이 아니라 참조 형태로 가져오기 때문에 주의해야함
+	//캡처를 잘못 이해하고 있으면 아래와 같은 문제가 생길 수 있음(CaptureLoop, CaptureLoop2 참고)
+	CaptureLoop()
+	CaptureLoop2()
 }
 
 // 가변 인수 함수를 선언하는 방법은 인자를 설정하는 곳에서 ... 을 통해서 선언해두면 알아서 가변 인수 함수로 인식
@@ -98,5 +112,51 @@ func getOperator(op string) func(int, int) int {
 		return mul
 	} else {
 		return nil
+	}
+}
+
+// 함수 리터럴을 사용한 예제
+type opFunc func(int, int) int
+
+func getOperator2(op string) opFunc {
+	if op == "+" {
+		return func(a, b int) int { //함수 리터럴을 통해, 함수를 새로 정의해서 리턴
+			return a + b
+		}
+	} else if op == "*" {
+		return func(a, b int) int { //함수 리터럴을 통해, 함수를 새로 정의해서 리턴
+			return a * b
+		}
+	} else {
+		return nil
+	}
+}
+
+func CaptureLoop() {
+	f := make([]func(), 3) //함수 리터럴 3개를 가진 슬라이스
+	fmt.Println("ValueLoop")
+	for i := 0; i < 3; i++ {
+		f[i] = func() {
+			fmt.Println(i) //캡쳐된 i 값을 출력
+		}
+	}
+
+	for i := 0; i < 3; i++ {
+		f[i]()
+	}
+}
+
+func CaptureLoop2() {
+	f := make([]func(), 3) //함수 리터럴 3개를 가진 슬라이스
+	fmt.Println("ValueLoop2")
+	for i := 0; i < 3; i++ {
+		v := i
+		f[i] = func() {
+			fmt.Println(v) //캡쳐된 v 값을 출력
+		}
+	}
+
+	for i := 0; i < 3; i++ {
+		f[i]()
 	}
 }
