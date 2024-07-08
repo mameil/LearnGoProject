@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"container/ring"
 	"fmt"
 )
 
@@ -104,6 +105,83 @@ func main() {
 		val = stack.Pop()
 	}
 
+	//링
+	//링은 말그대로 데이터의 구조가 맨앞과 맨뒤가 연결되어있는 형태입니다
+	//특이사항으로는 이 데이터의 구조는 시작과 끝은 없고 다만 현재 위치만이 있는 그러한 구조임
+	r := ring.New(5) //이건 구조체로써 데이터를 제공해주네 ㄷㄷㄷ
+	n := r.Len()
+
+	for i := 0; i < n; i++ { //현재를 기준으로 앞으로 돌면서 하나씩 노출
+		r.Value = 'A' + i
+		r = r.Next()
+	}
+
+	for j := 0; j < n; j++ { //현재를 기준으로 앞으로 돌면서 하나씩 노출
+		fmt.Printf("%c", r.Value)
+		r = r.Next()
+	}
+	fmt.Println()
+
+	for j := 0; j < n; j++ { //현재를 기준으로 뒤로 돌면서 하나씩 노출
+		fmt.Printf("%c", r.Value)
+		r = r.Prev()
+	}
+
+	//Map
+	//key-value 로 저장하는 데이터구조이고 키를 기반으로 값을 저장, 가져오는 구조이고
+	//링처럼 container 패키지 안에 기본으로 제공해줌
+	//기본적인 사용 예시는 아래와 같음
+	myMap := make(map[string]string)
+	myMap["alice"] = "Main"
+	myMap["bob"] = "Sub"
+	myMap["charlie"] = "Sub"
+
+	fmt.Println("Charlie in MyMap : ", myMap["charlie"])
+	fmt.Println("Bob in MyMap : ", myMap["bob"])
+	fmt.Println("Alice in MyMap : ", myMap["alice"])
+	fmt.Println("Unknown Key in MyMap : ", myMap["undefined"]) //빈값이 나옴
+
+	//위처럼 하나하나 보면서 처리하는것도 방법이지만 그냥 전체를 순회하면서 처리도 가능
+	for key, value := range myMap {
+		fmt.Println("key : ", key, "/ value :", value)
+	}
+
+	//맵안에 있는 데이터는 key 를 기반으로 찍어서 삭제 가능(p1: 처리하고자 하는 map 변수, p2: 삭제하고자 하는 key)
+	delete(myMap, "alice")
+	for key, value := range myMap {
+		fmt.Println("[VER2] key : ", key, "/ value :", value)
+	}
+	fmt.Println("Alice key is deleted : alice value - ", myMap["alice"]) //삭제되면 해당 데이터 타입의 기본값으로 처리됨
+
+	//추가로 map 에서 데이터를 꺼내올 때 사실 그 값만 가져오는게 아니라 "존재 여부" 도 같이 응답값으로 내려줌
+	bob, isOk := myMap["bob"]
+	fmt.Println(bob)  //Sub
+	fmt.Println(isOk) //true
+
+	alice, isOk := myMap["alice"]
+	fmt.Println(alice) //string 기본값 공백
+	fmt.Println(isOk)  //false
+
+	/**
+	지금까지 봤던 모든 자료구조를 되짚어보면
+	배열, 슬라이스는 > 추가와 삭제가 O(n) 읽기가 O(1)
+	리스트는 > 추가와 삭제가 O(1) 읽기가 O(n)
+	맵은 > 추가, 삭제, 읽기 모두 O(1)
+
+	맵이 여러 방면으로 빠른 속도를 자랑하는데 그 이유는 해쉬 함수를 보면 된다
+	해쉬 함수에서 "해쉬"란, 잘게 부순다는 의미를 가지고 있음
+	해쉬 함수가 되기 위해서는 크게 3가지 조건이 있음
+	1. 같은 입력이 들어오면, 같은 결과가 나와야함
+	2. 다른 입력이 들어오면, 되도록이면 다른 결과가 나와야함
+	3. 입력값의 범위는 무한대이고 결과는 특정 범위를 갖는다
+	>> 좋은 예시로 삼각함수가 있음
+	같은 입력을 넣으면 같은 값이 나옴, 예를 들면 sin(90) 이런건 항상 상수 1을 리턴해주고
+	다른 입력을 엏으면 되도록 다름 예를 들면 sin(90) 이랑 sin(91) 은 결과값이 다름
+	입력값은 무한대이지만 결과값은 항상 -1, 1 사이에 수렴한다
+	이처럼 "나머지 연산" 에서도 함수가 사용됨
+	나머지 연산도 결국 입력값에 대해서 입력값보다 작은 값에서 돌아가면서 정해진 수가 나옴
+
+	*/
 }
 
 // 사실 shiftx2 을 통해서 non-project items 활성화시키고 보면 실제 Element 가 어떻게 구성되어있는지 확인 가능
