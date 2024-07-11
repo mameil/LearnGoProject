@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strconv"
+	"strings"
 )
 
 /*
@@ -63,11 +65,22 @@ func main() {
 	err = RegisterAccount("myId", "myPw") //ID, PW 입력
 	if err != nil {
 		if errInfo, ok := err.(PasswordError); ok { //인터페이스 변환
+			//golang 에서는 기본적으로 인터페이스를 통하면 어떤 타입이든 동일한 동작을 수행하는 것이 가능한데
+			//여기서의 err.(PasswordError) 로직은 "타입 단언"이라는 기능을 사용한 케이스임 >이건 err 변수가 PasswordError 인지 체크하는 로직임
+			//만약에 err 가 PasswordError 타입이면, ok 는 true 값이 되면서 errInfo 는 PasswordError 타입으로 설정됨
+			//만약에 err 가 PasswordError 타입이 아니면, ok 는 false 가 되면서 errInfo 는 nil 으로 설정됨
 			fmt.Printf("%v Len: %d RequiredLen: %d\n", errInfo, errInfo.Len, errInfo.RequiredLen)
 		}
 	} else {
 		fmt.Println("회원 가입에 성공했습니다.")
 	}
+
+	//에러 래핑
+	//에러를 감싸서 새로운 에러를 만들어야하는 경우도 존재함
+	//예시) 파일에서 텍스트를 읽어서 특정 타입의 데이터로 변환하는 경우 파일 읽기에서 발생하는 에러도 필요하지만, 텍스트의 몇 번쨰 줄의 몇 번째 칸에서 에러가 발생하는지 알아야함...
+	//MultipleFromString(), readNextInt(), readEq()
+	readEq("123 3")   // 여기까진 성공
+	readEq("123 abc") // 123까진 성공
 }
 
 func ReadFile(fileName string) (string, error) {
@@ -122,4 +135,51 @@ func RegisterAccount(name, password string) error {
 		return PasswordError{len(password), 8}
 	}
 	return nil
+}
+
+func MultipleFromString(str string) (int, error) {
+	scanner := bufio.NewScanner(strings.NewReader(str)) //스캐너 생성
+	scanner.Split(bufio.ScanWords)                      //한 단어씩 끊어서 읽기
+
+	pos := 0
+	a, n, err := readNextInt(scanner)
+	if err != nil {
+		return 0, fmt.Errorf("Failed to readNextInt(), pos:%v err:%v", pos, err)
+		//에러 감싸기
+	}
+
+	pos += n + 1
+	b, n, err := readNextInt(scanner)
+	if err != nil {
+		return 0, fmt.Errorf("Failed to readNextInt(), pos:%d err:%v", pos, err)
+	}
+	return a + b, nil
+}
+
+// 다음 단어를 읽어서 숫자로 변환하여 리턴한다
+// 변환된 숫자, 읽은 글자 수, 에러를 리턴한다
+func readNextInt(scanner *bufio.Scanner) (int, int, error) {
+	if !scanner.Scan() { //단어 읽기
+		return 0, 0, fmt.Errorf("Failed to scan")
+	}
+
+	word := scanner.Text()
+	number, err := strconv.Atoi(word) //문자열을 숫자로 변환
+	if err != nil {
+		return 0, 0, fmt.Errorf("Failed to convert word to int, word: %v err: %v", word, err) //에러 감싸기
+	}
+	return number, len(word), nil
+}
+
+func readEq(eq string) {
+	rst, err := MultipleFromString(eq)
+	if err == nil {
+		fmt.Println(rst)
+	} else {
+		fmt.Println(err)
+		var numError *strconv.NumError
+		if errors.As(err, &numError) { //감싸진 에러가 NumError 인지 확인
+			fmt.Println("NumberError:", numError)
+		}
+	}
 }
