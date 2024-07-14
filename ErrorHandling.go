@@ -138,11 +138,13 @@ func RegisterAccount(name, password string) error {
 }
 
 func MultipleFromString(str string) (int, error) {
-	scanner := bufio.NewScanner(strings.NewReader(str)) //스캐너 생성
-	scanner.Split(bufio.ScanWords)                      //한 단어씩 끊어서 읽기
+	scanner := bufio.NewScanner(strings.NewReader(str)) //스캐너 생성 >> NewScanner() 는 io.Reader 인터페이스를 인수로 받기 때문에 string 타입을 io.Reader 로 만들어주려고 strings.NewReader() 를 사용
+	scanner.Split(bufio.ScanWords)                      //한 단어씩 끊어서 읽기  >> Split 을 통해서 어떻게 끊어서 읽을지를 알려주고, bufio.ScanWords 을 통해 단어를 기준으로 읽게되고 bufio.ScanLines 을 사용하면 한 줄씩 끊어서 읽게됨
 
+	//2번 잘라서 읽는다
 	pos := 0
 	a, n, err := readNextInt(scanner)
+	//2번을 각각 수행하면서 에러 있으면 그때그때 뱉음
 	if err != nil {
 		return 0, fmt.Errorf("Failed to readNextInt(), pos:%v err:%v", pos, err)
 		//에러 감싸기
@@ -150,6 +152,7 @@ func MultipleFromString(str string) (int, error) {
 
 	pos += n + 1
 	b, n, err := readNextInt(scanner)
+	//2번을 각각 수행하면서 에러 있으면 그때그때 뱉음
 	if err != nil {
 		return 0, fmt.Errorf("Failed to readNextInt(), pos:%d err:%v", pos, err)
 	}
@@ -178,6 +181,9 @@ func readEq(eq string) {
 	} else {
 		fmt.Println(err)
 		var numError *strconv.NumError
+		//감싸진 에러를 꺼내오는 방법
+		//As() 메소드를 통해서 err 안에 감싸진 에러 중 두 번째 인수의 타입인 *strconv.NumError 로 변환될 수 있는 에러가 있다면 변환하여 값을 넣고 true 를 반환
+		//추가로 Is() 메소드를 통해서 단순하게 객체 타입만을 확인하는 것도 가능하니 As 로 아에 타입 캐스팅을 처리해서 확인하는 방법도 있고, Is() 을 통해서 객체 타입 체크만해서 확인하는 방법도 있다 이정도
 		if errors.As(err, &numError) { //감싸진 에러가 NumError 인지 확인
 			fmt.Println("NumberError:", numError)
 		}
