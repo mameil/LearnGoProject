@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -81,6 +82,38 @@ func main() {
 	//MultipleFromString(), readNextInt(), readEq()
 	readEq("123 3")   // 여기까진 성공
 	readEq("123 abc") // 123까진 성공
+
+	//패닉
+	//패닉은 프로그램을 정상 진행시키니 어려운 상황에 다달았을 때 프로그램 흐름을 중지시키는 기능
+	//golang 의 내장 함수로 panic() 이 존재함
+	//프로그램을 수행하다보면 잘못된 메모리에 접근하거나 메모리가 부족하게되면 예상하지 못한 에러로 인해 프로그램을 더 이상 진행하는데 제한되는 케이스가 있음
+	//>> 이런 상황에 어떤 곳에서 이슈가 발생했는지 panic() 을 통해서 빠르게 프로그렘을 강제 종료하고 문제가 발생한 곳을 알려주는 방법도 있음
+	//+ 버그 수정에 용이함
+	//divide() 참고
+	divide(4, 2)
+	//divide(4, 0) //캬 내가 아는 그 e.printStackTrace() 가 수행되는구만 > 하지만 프로그램이 종료되기 때문에 일단 주석
+
+	//추가로 panic 내장 함수의 인수는 interface{] 형식으로, 즉 아무 형태의 데이터나 다 들어갈 수 있다
+	//일반적으로는 string 타입의 메세지나 fmt.Errorf() 을 통해서 넘기긴함
+
+	//근데 그냥 에러를 띡 던지고 프로그램이 종료되버리면 사용자 입장에서는 좀 어지러움
+	//그래서 문제가 발생하더라도, 프로그램이 종료되는 대신 에러 메세지를 표시하고 복구를 시도하는 것이 가능하다
+	//panic()은 호출 순서를 거슬러 올라가서 진행
+	//main() -> f() -> g() -> h() 형식으로 호출하다가 h() 에서 panic() 이 수행되면 함수의 호출순서 반대로 거슬러 올라가는데
+	//main() 함수에서까지 복구되지 않으면 그제서야 프로그램이 그때 종료됨 > 어느 단계에서든 패닉은 복구된 시점부터 프로그램이 계속됨 + recover() 을 통해서 패닉을 복구
+	//recover() 함수가 호출되는 시점에 panic 이 전파중이라면, panic 객체를 리턴하고 아니면 nil 을 반환
+	//f(), g(), divide() 참고
+	f()                            //내부적으로 타고 들어가면 분모가 0 인 경우에 panic 이 발생해서 강제적으로 프로그램 수행이 종료되어야 하지만?
+	fmt.Println("내 프로그램은 아직 살아있다") //잘만 살아있다
+
+	//추가로 recover() 는 수행할꺼면 확실하게 트랜잭션처럼 작업을 묶어서 수행해야 한다, 에러나면 recover() 로 잡고 확실하게 롤백해야할 사항들에 대해서는 잘 챙겨야함
+
+	//recover() 는 panic()의 인자가 interface{} 로 되어있던 것 처럼 recover() 또한 리턴타입이 interface{} 임, 그래서 잘 사용하려면 확실하게 타입캐스팅을 통해서 처리해주는게 확실함
+	defer func() {
+		if r, ok := recover().(net.Error); ok {
+			fmt.Println("r is net.Error type", r)
+		}
+	}()
 }
 
 func ReadFile(fileName string) (string, error) {
@@ -188,4 +221,29 @@ func readEq(eq string) {
 			fmt.Println("NumberError:", numError)
 		}
 	}
+}
+
+func divide(a, b int) int {
+	if b == 0 {
+		panic("b 는 0일 수 없습니다") //패닉 발생
+	}
+	fmt.Printf("%d /%d = %d\n", a, b, a/b)
+	return a / b
+}
+
+func f() {
+	fmt.Println("f() 함수 시작")
+	defer func() { //함수가 종료될 때 실행되는 defer 함수를 통해서 어떤 패닉인진모르겠지만 일단 recover 처리를 통해서 프로그램을 종료하지 않고 수행되도록 처리
+		if r := recover(); r != nil {
+			fmt.Println("panic 복구 - ", r)
+		}
+	}()
+
+	g() //자 여기서 에러가 터지긴할꺼야 ~ 일단 여기서 panic 발생하니 아래 Println 문은 실행되지 않음
+	fmt.Println("f() 함수 끝")
+}
+
+func g() {
+	fmt.Println("9 / 3 = %d\n", divide(9, 3))
+	fmt.Println("9 / 0 = %d\n", divide(9, 0)) //여기서 panic 발생!!!
 }
