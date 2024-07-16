@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
 /**
 	고루틴이란,
 	Go 언어에서 관리하는 경량 스레드
@@ -12,7 +18,8 @@ package main
 > 고루틴 사이에서 메모리 간섭으로 인해 발생하는 문제에 특히 신경써야함
 */
 
-/**
+/*
+*
 스레드
 컴퓨터로 하여금
 한번에 한 프로세스만 동작시키는 작업을 싱글태스킹이라고 하고
@@ -50,7 +57,65 @@ ex)
 
 서론이 길었는데, go 언어에서는 걱정할 필요가 없다네 > cpu 코어마다 os 스레드를 하나만 할당해서 사용하기 때문에 go 언어에서는 컨텍스트 스위칭 비용이 발생하지 않는다
 */
+var wg sync.WaitGroup
 
 func main() {
 
+	/**
+	고루틴의 사용
+	기본적으로 모든 고 프로그램은 고루틴을 하나씩 사용하고 있고 그건 바로 "메인루틴"이다
+	메인루틴은 main() 함수와 함께 시작되고, main() 함수가 종료되면 같이 종료됨
+
+	고루틴을 생성하는 방법은
+	>> go 함수_호출
+	go 키워드를 쓰고 함수를 호출하면, 해당 함수를 수행하는 고루틴이 현재 해당 작업이 수행되는 고루틴에서 새롭게 하나가 떨어져나가면서 만들어진다
+	PrintHangul(), PrintNumbers()
+	*/
+	go PrintHangul()
+	go PrintNumber()
+	time.Sleep(3 * time.Second) //3초 대기
+	//결과 : 가 1 나 2 다 3 라 마 4 바 5 사
+	//위 2 함수가 별도의 스레드에서 수행되기 댸문에 지멋대로 순서가 뒤죽박죽서 나오는걸 볼 수 있음
+
+	//이렇게 순서를 보장하지 못하면 얼마나 불편한가?
+	//순서를 특별하게 보장해야하는 케이스에는 특정 고루틴이 종료되는 것을 기다렸다가 수행하는 방법으로 순서를 보장하는 것이 가능하다
+	//sync.WaitGroup 객체를 통해서 가능함
+	//var wg sync.WaitGroup
+	//wg.Add(3) //작업 갯수 설정
+	//wg.Done() //작업이 완료될때마다 호출
+	//wg.Wait() //모든 작업이 완료될 때까지 대기
+
+	//SumAtoB
+	wg.Add(10) //대기그룹에 10개를 설정
+	for i := 0; i < 10; i++ {
+		go SumAtoB(1, 100000000)
+	}
+
+	wg.Wait() //모든 작업이 끝나는걸 대기 + 원래라면 다 다른 스레드로해서 for 문 안에서 수행되는 모든 작업들은 별도의 고루팀에서 작업이 되면서 메인루틴도 수행이 되니까 바로 밑의 fmt.Println 을 찍어야 하는데
+	//WaitGroup 이 끝날때까지 메인 루틴보고 기다리라고 해서 저게 수행되는걸 기다렸다가 맨 마지막에 fmt.Println 을 찍는 모습
+	fmt.Println("모든 계산이 완료됨")
+}
+
+func PrintHangul() {
+	hanguls := []rune{'가', '나', '다', '라', '마', '바', '사'}
+	for _, v := range hanguls {
+		time.Sleep(300 * time.Millisecond) //0.3초 씩 대기하면서 찍고
+		fmt.Printf("%c ", v)
+	}
+}
+
+func PrintNumber() {
+	for i := 1; i <= 5; i++ {
+		time.Sleep(400 * time.Millisecond) //0.4초씩 대기하면서 찍고
+		fmt.Printf("%d ", i)
+	}
+}
+
+func SumAtoB(a, b int) {
+	sum := 0
+	for i := 0; i <= b; i++ {
+		sum += i
+	}
+	fmt.Printf("%d부터 %d까지의 합계는 %d입니다\n", a, b, sum)
+	wg.Done()
 }
