@@ -127,6 +127,27 @@ func main() {
 	지금까지 그림에서 봐온 것 처럼 고루틴이 동작할 때는, 기본적으로 cpu 코어에 os 스레드를 연결시켜놓고, 수행되는 고루틴만 변경한다
 	이건 결국 컨텍스트 스위칭이 일어나지 않음을 이야기하고, 이 때문에 고루틴을 막 사용하는 것에 대해서는 부담없이 사용할 수 있음
 	*/
+
+	/**
+	이렇게 프로그램의 수행을 병렬로 동시에 수행하게 되면 문제점은 "동일한 메모리 자원"에 여러 고루틴이 접근하는 것이 문제가 될 수 있음
+	동시성을 보장하기 위해서 뮤텍스를 사용해서 자원의 접근을 제한하는 방법이 있다
+	뮤텍스는 mutual exclusion 을 줄인말이고, 상호배제의 의미를 가짐
+	뮤텍스의 Lock() 을 통해서 락을 잡고 처리하고, Unlock() 을 통해서 락 해제를 해주면 대기하던 고루틴 중 하나가 이걸 획득함
+	ex > Account, DepositAndWithdraw()
+	*/
+	var wg2 sync.WaitGroup
+	account := &Account{0}
+	wg2.Add(10)
+	for i := 1; i < 10; i++ {
+		go func() {
+			for {
+				DepositAndWithdraw(account)
+			}
+			wg2.Done()
+		}()
+	}
+	wg2.Wait()
+
 }
 
 func PrintHangul() {
@@ -151,4 +172,17 @@ func SumAtoB(a, b int) {
 	}
 	fmt.Printf("%d부터 %d까지의 합계는 %d입니다\n", a, b, sum)
 	wg.Done()
+}
+
+type Account struct {
+	Balance int
+}
+
+func DepositAndWithdraw(account *Account) {
+	if account.Balance < 0 {
+		panic(fmt.Sprintf("Balance should not be negative value: %d", account.Balance))
+	}
+	account.Balance += 1000
+	time.Sleep(time.Millisecond)
+	account.Balance -= 1000
 }
