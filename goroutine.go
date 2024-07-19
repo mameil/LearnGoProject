@@ -135,10 +135,24 @@ func main() {
 	뮤텍스의 Lock() 을 통해서 락을 잡고 처리하고, Unlock() 을 통해서 락 해제를 해주면 대기하던 고루틴 중 하나가 이걸 획득함
 	ex > Account, DepositAndWithdraw()
 	*/
+	//아래는 뮤텍스의 락을 처리하지 않은 코드
+	//var wg2 sync.WaitGroup
+	//account := &Account{0}
+	//wg2.Add(10)
+	//for i := 1; i < 10; i++ {
+	//	go func() {
+	//		for {
+	//			DepositAndWithdraw(account)
+	//		}
+	//		wg2.Done()
+	//	}()
+	//}
+	//wg2.Wait()
+
 	var wg2 sync.WaitGroup
 	account := &Account{0}
 	wg2.Add(10)
-	for i := 1; i < 10; i++ {
+	for i := 0; i < 10; i++ {
 		go func() {
 			for {
 				DepositAndWithdraw(account)
@@ -148,6 +162,22 @@ func main() {
 	}
 	wg2.Wait()
 
+	/*
+		뮤텍스를 사용하면 동시성을 처리하는 것이 가능하지만 여전히 이슈가 발생할 수 있는 점이 있음 > goroutine_deadlock.go
+	*/
+
+	//결과적으로 정리해보면
+	// 멀티코어 컴퓨터에서는 여러 고루틴을 사용하여 성능 향상이 가능
+	// 하지만 같은 메모리를 여러 고루틴이 접근하면 프로그램이 꼬일 수 있음
+	// 뮤텍스를 사용하면 동시에 고루틴이 하나만 접근하게 할 수 있어 꼬이는 것을 방지
+	// 하지만 잘못 사용하는 케이스에는 결과적으로 성능이 저하될 수도 있으니 적절하게 사용하자
+
+	//또 다른 방법으로는 다양한 고루틴이 하나에 접근하지 않도록 분리해서 처리하는 방법이다
+	//영역을 나눠서 처리하던가, 역할을 나누던가
+	//종이에 그림을 그린다고 가정해봤을 떄
+	//종이의 영역을 나눠서 그리라고 하면 서로 영역이 겹치지 않으니 괜찮고
+	//그림을 그리는 프로세스 중, 밑그림, 배경 등 역할을 나누면 서로 역할이 겹치지 않으니 괜찮다
+	//어떻게 보면 도메인을 나눠서 처리하는 방안
 }
 
 func PrintHangul() {
@@ -174,11 +204,18 @@ func SumAtoB(a, b int) {
 	wg.Done()
 }
 
+var mutex sync.Mutex
+
 type Account struct {
 	Balance int
 }
 
 func DepositAndWithdraw(account *Account) {
+	mutex.Lock() //락잡아주고 | 해당 코드가 있으면 해당 고루틴이 뮤텍스를 획득할때까지 대기하고
+	///////////////////////아래의 로직은 무조건 뮤텍스를 확보한 단 하나의 고루틴만 실행하게됨
+
+	defer mutex.Unlock() //함수 종료시 무조건 Lock 풀어주기(한번이라도 락을 획득했으면 "무조건" Unlock 을 통해서 락을 풀어줘야함
+
 	if account.Balance < 0 {
 		panic(fmt.Sprintf("Balance should not be negative value: %d", account.Balance))
 	}
