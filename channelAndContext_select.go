@@ -24,7 +24,7 @@ func main() {
 	}
 
 	quit <- true
-	wg.Add()
+	wg.Wait()
 }
 
 func square3(wg *sync.WaitGroup, ch chan int, quit chan bool) {
