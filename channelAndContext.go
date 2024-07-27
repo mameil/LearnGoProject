@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
 )
+
+var wg2 sync.WaitGroup
 
 func main() {
 	//go 언어에서 Channel 과 Context 는 동시성 프로그래밍을 도와주는 기능임
@@ -59,7 +62,53 @@ func main() {
 	//채널을 다 사용하고나면 정상적으로 close 해줘야 메모리 누수에서부터 해방될 수 있다 >> 기껏 고루틴으로 작업하는거면 제대로 쓰자
 
 	//select 문
-	//channelAndContext.select.go 에서 확인
+	//channelAndContext_select.go 에서 확인
+
+	//일정 간격으로 수행하는 로직
+	//channelAndContext_term.go 에서 확인
+
+	//채널로 생산자 소비자 패턴으로 구현하기
+	//channelAndContext_consume_pattern.go 에서 확인
+
+	//컨텍스트 사용하기
+	/**
+	context 은 자체적인 패키지에서 제공해주는 기능으로, 작업을 지시할 때 작업 가능 시간, 작업 취소 등의 조건을 지시할 수 있는 작업 명세서 역할을 함
+	새로운 고루틴으로 작업을 시작할 때 "일정 시간 동안만 작업을 지시하거나 외부에서 작업을 취소할 때 사용" 또는 작업 설정에 관한 데이터를 전달할 수도 있음
+	*/
+
+	//작업 취소가 가능한 컨텍스트 >> 이걸 만들어서 작업자에게 전달하면 작업을 지시한 지시자가 원할 때 작업 취소를 알릴 수 있음
+	//PrintEverySecond() 확인
+	wg2.Add(1)
+
+	//WithCancel 함수는 상위 컨텍스트를 인수로 넣어주면, 그 컨텍스트를 감싼 컨텍스트를 생성
+	//만약에 상위 컨텍스트가 없다면, 기본적으인, context.Background() 을 넣어줘야 함
+	//context.WithCancel() 함수는 값을 2개를 반환해주는데, 첫번째 리턴값(ctx) 은 컨텍스트 객체, 두번째 리턴값(cancel)은 취소 함수로, 이걸 사용해서 원할때 작업 내용 취소 가능
+	ctx, cancel := context.WithCancel(context.Background()) //create context
+
+	go PrintEverySecond(ctx) //초마다 계속해서 Tick 을 부르는 로직이 수행되다가
+	//5초 이후에
+	time.Sleep(5 * time.Second)
+	//취소를 날려서 작업을 취소
+	cancel()
+
+	wg2.Wait()
+
+	//작업 시간을 설정한 컨텍스트
+	//취소랑 비슷하게 사용하면 되는데, 단순이 WithCancel() 대신에 WithTimeout() 을 사용하고, 함수의 첫번째 인자는 동일하게 context 넣어주면되구 두번째 인자로 설정하고 싶은 시간을 넣어주면 됨
+	//ctx, cancel:= context.WithTimeout(context.Background(), 3*time.Second)
+
+	//특정 값을 설정한 컨텍스트
+	//작업을 지시하는데 있어서, 특정 값에 따라서 분기를 쳐서 수행시키고 싶은 경우가 있을텐데
+	//이때 컨텍스트에 특정 키를 기반으로 값을 읽어오게 설정하는 것이 가능한데, 이 기능을 사용한다
+	//그게 바로 context.WithValue() 임
+	//square27 check
+	ctx2 := context.WithValue(context.Background(), "number", 9) //number 라는 키의 값을 9로 설정한 컨텍스트를 만들어준다
+	go square27(ctx2)                                            //위에서 만든 키-값 기반의 컨텍스트를 넘겨서 사용한다
+	wg3.Wait()
+
+	//굉장히 어지러웠지만, 채널과 컨텍스트를 기반으로 동시성프로그래밍을 하는 방법에 대해서 알아봤는데
+	//Go 언어에서는채널과 컨텍스트를 사용해서 동시성 프로그래밍을 하는데 활발하게 사용된다는 점
+	//구글에 golang concurrency patterns 검색하면 잘 나온다넹
 }
 
 func square(wg *sync.WaitGroup, ch chan int) {
@@ -68,4 +117,25 @@ func square(wg *sync.WaitGroup, ch chan int) {
 	time.Sleep(time.Second)
 	fmt.Printf("Square: %d\n", n*n)
 	wg.Done()
+}
+
+func PrintEverySecond(ctx context.Context) {
+	tick := time.Tick(time.Second)
+	for {
+		select {
+		case <-ctx.Done():
+			wg2.Done()
+			return
+		case <-tick:
+			fmt.Println("Tick")
+		}
+	}
+}
+
+func square27(ctx context.Context) {
+	if v := ctx.Value("number"); v != nil {
+		n := v.(int) //context.Context.Value() 메소드의 기본적인 리턴타입은 interface{} 이기 때문에 꼭 타입 변환작업을 해주고 사용해야함
+		fmt.Printf("Square: %d\n", n*n)
+	}
+	wg3.Done()
 }
