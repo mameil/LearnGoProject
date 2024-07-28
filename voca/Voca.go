@@ -18,6 +18,12 @@ type FindInfo struct {
 	lines    []LineInfo
 }
 
+/**
+* VocaReadme.md 를 참고해서 프로그램을 만들어보자
+* goLang 을 이용해서 프로그램을 만든건 처음이니 혹시 몰라서 적어둠
+* goLang 에서 run > edit configuration 에 들어가서 "output Directory" 에다가 build 해서 나온 "실행파일"이 어디에 저장됬으면 하는지 지정해주고
+* terminal 에서 프로그램을 실행 시 사용할 환경변수와 함께 넣어줘서 실행시키면 잘만됨
+ */
 func main() {
 	if len(os.Args) < 3 {
 		informReturn("해당 프로그램을 수행하기 위해선 \"find\" + \"찾을 단어\" + \"파일명\" 을 입력해주셔야 합니다")
