@@ -1,0 +1,9 @@
+i am sick of making test sample related to name
+
+I'm wonder why i selected a keyword with name
+
+I don't have any imagination to make a test sample with name
+
+is my name is kd.shim??
+
+i guess thjs sentence should not be printed because there is no "name" keyword in this sentence
