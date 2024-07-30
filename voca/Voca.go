@@ -8,17 +8,18 @@ import (
 	"strings"
 )
 
-type LineInfo struct {
+type LineInfo2 struct {
 	lineNum int
 	line    string
 }
 
-type FindInfo struct {
+type FindInfo2 struct {
 	fileName string
-	lines    []LineInfo
+	lines    []LineInfo2
 }
 
-/**
+/*
+*
 * VocaReadme.md 를 참고해서 프로그램을 만들어보자
 * goLang 을 이용해서 프로그램을 만든건 처음이니 혹시 몰라서 적어둠
 * goLang 에서 run > edit configuration 에 들어가서 "output Directory" 에다가 build 해서 나온 "실행파일"이 어디에 저장됬으면 하는지 지정해주고
@@ -36,7 +37,7 @@ func main() {
 	fmt.Println("파일 검색 프로그램이 시작됩니다......")
 	fmt.Println("찾으려는 단어 : ", word)
 	fmt.Println("찾을 대상의 파일 수 : ", len(files))
-	findInfos := []FindInfo{}
+	findInfos := []FindInfo2{}
 	for _, path := range files {
 		fmt.Println("================================================")
 		fmt.Println("파일 검색을 시작합니다...")
@@ -70,8 +71,8 @@ func GetFileList(path string) ([]string, error) {
 	return filepath.Glob(path)
 }
 
-func FindWordInAllFiles(word, path string) []FindInfo {
-	findInfos := []FindInfo{}
+func FindWordInAllFiles(word, path string) []FindInfo2 {
+	findInfos := []FindInfo2{}
 
 	fileList, err := GetFileList(path)
 	if err != nil {
@@ -85,8 +86,8 @@ func FindWordInAllFiles(word, path string) []FindInfo {
 	return findInfos
 }
 
-func FindWordInFile(word, fileName string) FindInfo {
-	findInfo := FindInfo{fileName, []LineInfo{}}
+func FindWordInFile(word, fileName string) FindInfo2 {
+	findInfo := FindInfo2{fileName, []LineInfo2{}}
 	file, err := os.Open(fileName)
 
 	if err != nil {
@@ -100,7 +101,7 @@ func FindWordInFile(word, fileName string) FindInfo {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, word) {
-			findInfo.lines = append(findInfo.lines, LineInfo{lineNum, line})
+			findInfo.lines = append(findInfo.lines, LineInfo2{lineNum, line})
 		}
 		lineNum++
 	}
