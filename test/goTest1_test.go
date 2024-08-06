@@ -26,5 +26,5 @@ func TestGoTestTestifyVer(t *testing.T) {
 
 func TestGoTestTestifyVer2(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(10, multiply(3), "multiply(3) should be 9")
+	assert.Equal(9, multiply(3), "multiply(3) should be 9")
 }
