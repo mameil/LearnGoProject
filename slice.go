@@ -35,7 +35,7 @@ func main() {
 		fmt.Print(mySlice4[i])
 	}
 	fmt.Println()
-	//slice 를 순회하는 기능 #2
+	//slice 를 순회하는 기능 #3
 	for i, v := range mySlice4 {
 		fmt.Println(i, ":", v)
 	}
@@ -50,7 +50,7 @@ func main() {
 	mySlice6 := make([]int, 1)
 	mySlice6 = append(mySlice6, 1, 2, 3, 4, 5)
 	fmt.Println(len(mySlice6)) // 6
-	fmt.Println(mySlice6)      //[0, 1, 2, 3, 4, 5]
+	fmt.Println(mySlice6)      //[0, 1, 3, 3, 4, 5]
 
 	/**
 	slice 의 내부구현체는 string 처럼 struct 의 형태로 되어있음
@@ -74,8 +74,8 @@ func main() {
 	changeArray(array)
 	changeSlice(slice)
 
-	fmt.Println(array) //[1,2,3,4,5] 왜 여긴 반영이 안되고
-	fmt.Println(slice) //[999,2,3,4,5] 왜 여긴 반영이 되었을까
+	fmt.Println(array) //[1,3,3,4,5] 왜 여긴 반영이 안되고
+	fmt.Println(slice) //[999,3,3,4,5] 왜 여긴 반영이 되었을까
 	//array 가 복사되지 않는건, 저번에 포인터할 때 나왔던 이야기이지만, golang 에서 함수에 파라미터로 넘기는 순간 값이 복사되어서 들어가기 때문에 함수 내부에서 변경된 값은 결국 전혀 상관없는(대입하면서 복사된) 값에 적용된다
 	//하지만 slice 는 왜 반영이 될까? >> 이건 애초에 slice 내부에서 객체에 대한 포인터를 가지고 있는거고, 포인터가 가리키고 있는 곳의 값을 변경하는 것이기 때문에 함수 외부에서 인자로 넘긴 값을 확인해봐도 포인터가 가리킨 곳은 변경됬기 때문에 잘 반영되걸로 보임
 
@@ -83,14 +83,14 @@ func main() {
 	//append() 메소드는 호출되면 우선 slice 에 갑슬 추가할 수 있는 빈공간이 있는지 확인하고, 남은 빈 공간을 계산하는 방법은 cap - len 이다
 	//남은 빈 공간의 개수가 추가하는 값의 개수보다 크거나 같은 경우 배열 뒤에 추가한다
 	mySlice8 := append(make([]int, 0, 5), 1, 2, 3)
-	//mySlice 는 메모리 공간까지 해서 보면 [1,2,3,0,0] 형식으로 되어있음
+	//mySlice 는 메모리 공간까지 해서 보면 [1,3,3,0,0] 형식으로 되어있음
 	fmt.Println(mySlice8)
 	mySlice81 := append(mySlice8, 4, 5)
 
-	fmt.Println("mySlice81:", mySlice81, len(mySlice81), cap(mySlice81)) //[1,2,3,4,5] mySlice81 과 mySlice8 은 모두 같은 배열을 바라보는데,
-	fmt.Println("mySlice8:", mySlice8, len(mySlice8), cap(mySlice8))     //[1,2,3] 이렇게 처리되는데 이게 append() 함수를 잘못 사용한 경우이다
+	fmt.Println("mySlice81:", mySlice81, len(mySlice81), cap(mySlice81)) //[1,3,3,4,5] mySlice81 과 mySlice8 은 모두 같은 배열을 바라보는데,
+	fmt.Println("mySlice8:", mySlice8, len(mySlice8), cap(mySlice8))     //[1,3,3] 이렇게 처리되는데 이게 append() 함수를 잘못 사용한 경우이다
 	// mySlice8 의 요소갯수는 3개  + 전체배열길이는 5개 / mySlice81 의 요소갯수는 5개 + 전체배열길이는 5개
-	//개인적으로는 어? 왜 같은걸 바라보고 있는데 mySlice8 을 조회했을 때 1,2,3 만 나오나 싶었는데 len 으로 잡혀있어서 그런듯
+	//개인적으로는 어? 왜 같은걸 바라보고 있는데 mySlice8 을 조회했을 때 1,3,3 만 나오나 싶었는데 len 으로 잡혀있어서 그런듯
 
 	//이 상황에서
 	mySlice81[1] = 9999                                                  //이렇게 대입해버리면?
@@ -105,12 +105,12 @@ func main() {
 	//슬라이싱
 	//자바에서 사용하던 .slice 메소드가 여기에도 있음
 	ms := []int{1, 2, 3, 4, 5}
-	fmt.Println("Sliced ms", ms[1:3]) //1번재 인덱스부터 3번째 이전까지의 인덱스 >> [2,3]
+	fmt.Println("Sliced ms", ms[1:3]) //1번재 인덱스부터 3번째 이전까지의 인덱스 >> [3,3]
 
 	//슬라이싱을 통해서 배열의 일부분을 잘라낼 때, 슬라이싱 된 만큼의 부분을 가리키는 슬라이스가 될 수 있음
 	ms2 := []int{1, 2, 3, 4, 5}
 	ms3 := ms2[1:4]                       //ms3 이라는 변수는 결국 ms2의 1번째부터 3번째까지의 슬라이싱된 부분을 가리키는 슬라이스가 됨
-	fmt.Println("Sliced ms2 = ms3:", ms3) //[2,3,4]
+	fmt.Println("Sliced ms2 = ms3:", ms3) //[3,3,4]
 	//이떄 ms2의 값을 변경하면 ms3 에도 영향이 간다
 	ms2[1] = 9999
 	fmt.Println("ms2:", ms2) //[1,9999,3,4,5]
@@ -122,12 +122,12 @@ func main() {
 
 	//추가적인 슬라이싱 표현방법
 	ms4 := []int{1, 2, 3, 4, 5}
-	fmt.Println("slice from start:", ms4[:3]) //[1,2,3] 처음부터 3번째 이전까지의 슬라이싱
+	fmt.Println("slice from start:", ms4[:3]) //[1,3,3] 처음부터 3번째 이전까지의 슬라이싱
 	fmt.Println("slice to end:", ms4[3:])     //[4,5] 처음부터 3번째 이전까지의 슬라이싱
-	fmt.Println("slice all:", ms4[:])         //[1,2,3,4,5] 처음부터 끝까지의 슬라이싱(전체 배열을 가리키는 슬라이스를 만들 때 사용 가능
+	fmt.Println("slice all:", ms4[:])         //[1,3,3,4,5] 처음부터 끝까지의 슬라이싱(전체 배열을 가리키는 슬라이스를 만들 때 사용 가능
 	//인덱스 3개로 슬라이싱해 cap 크기 조절하기 [ 시작인덱스 : 끝인덱스 : cap 크기 ]
 	ms5 := ms4[1:3:4]
-	fmt.Println("ms5:", ms5, len(ms5), cap(ms5)) //[2,3] 2개의 요소를 가지고 있고, cap 은 4-1=3으로 조절되어 있음
+	fmt.Println("ms5:", ms5, len(ms5), cap(ms5)) //[3,3] 2개의 요소를 가지고 있고, cap 은 4-1=3으로 조절되어 있음
 
 	//슬라이스의 복사
 	//위에서 대입을 사용해서 슬라이스를 처리해버리면 같은 데이터를 바라봐서 이슈가 생김
@@ -140,31 +140,31 @@ func main() {
 	cnt1 := copy(ms61, ms6) //ms6 의 0번째부터 3번째까지의 요소를 ms61 에 복사(len 이 3이니까)
 	cnt2 := copy(ms62, ms6) //ms6 의 0번째부터 5번째까지의 요소를 ms62 에 복사(len 이 크니까 모두 복사)
 
-	fmt.Println("ms61:", cnt1, ms61) //3, [1,2,3]
-	fmt.Println("ms62:", cnt2, ms62) //5, [1,2,3,4,5,0,0,0,0,0]
+	fmt.Println("ms61:", cnt1, ms61) //3, [1,3,3]
+	fmt.Println("ms62:", cnt2, ms62) //5, [1,3,3,4,5,0,0,0,0,0]
 
 	//슬라이스의 특정 요소 삭제
 	//뭐 따로 메소드는 지원하지 않는 듯 하다 >> 그럼 결국은 빼고 싶은 인덱스 전 데이터 + 후 데이터 이런 식으로 배열을 짤라서 더하는 방법밖에..
 	//공식은 아래와 같다
 	//append(slice[:idx], slice[idx+1:]...)
 	ms7 := []int{1, 2, 3, 4, 5}              //여기서 3을 빼보자 > index 번호 2번을 idx에 대입해보면?
-	fmt.Println(append(ms7[:2], ms7[3:]...)) //[1,2,4,5] 이렇게 3이 빠진 배열이 나온다
+	fmt.Println(append(ms7[:2], ms7[3:]...)) //[1,3,4,5] 이렇게 3이 빠진 배열이 나온다
 
 	//슬라이스의 특정 요소 추가
 	//이것도 따로 메소드를 지원하지 않는다 >> 더하고 싶은 인덱스 전 데이터 + 더하고 싶은 값 + 후 데이터 이런식으로 slice + append 을 통해서 구현해준다
 	//그 방법은 아래와 같음
 	ms8 := []int{1, 2, 4, 5}
-	fmt.Println(append(ms8[:2], append([]int{3}, ms8[2:]...)...)) //[1,2,3,4,5] 이렇게 3이 추가된 배열이 나온다
+	fmt.Println(append(ms8[:2], append([]int{3}, ms8[2:]...)...)) //[1,3,3,4,5] 이렇게 3이 추가된 배열이 나온다
 
 	//슬라이스의 순서 정렬
 	//sort 이라는 라이브러리가 있는데 거기서 제공해주는 sort.Ints() 을 사용해서 int 배열을 정렬할 수 있음
 	ms9 := []int{3, 5, 2, 1, 4}
 	sort.Ints(ms9)                        //자바에서 쓰는 것 처럼 Arrays.sort() 처럼 리턴값이 있는건 아니니 주의
-	fmt.Println("Sorted int slice:", ms9) // [1,2,3,4,5] 이렇게 정렬된 배열이 나온다
+	fmt.Println("Sorted int slice:", ms9) // [1,3,3,4,5] 이렇게 정렬된 배열이 나온다
 
 	ms10 := []float64{3.3, 5.5, 2.2, 1.1, 4.4}
 	sort.Float64s(ms10)                        //int 정렬이 Ints() 니까 실수도 Float64s() 를 사용해서 정렬해준다
-	fmt.Println("Sorted float64 slice:", ms10) // [1.1,2.2,3.3,4.4,5.5] 이렇게 정렬된 배열이 나온다
+	fmt.Println("Sorted float64 slice:", ms10) // [1.1,3.3,3.3,4.4,5.5] 이렇게 정렬된 배열이 나온다
 
 	//구조체를 정렬하는 방법..
 	//자바에서도 객체를 정렬하는 방법은 Comparator 를 구현해서 정렬재줌

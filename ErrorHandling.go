@@ -51,7 +51,7 @@ func main() {
 		//아래서 재정의한 New() 을 통해서 에러를 전달하는 것도 가능
 		errors.New("이것도 에러를 발생시키는 방법 중 하나!")
 	} else {
-		fmt.Println("Sqrt -2 => ", sqrt)
+		fmt.Println("Sqrt -3 => ", sqrt)
 	}
 
 	//에러 타입

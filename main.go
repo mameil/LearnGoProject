@@ -43,7 +43,7 @@ func variable1() {
 }
 
 func variable2() {
-	//변수 놀이 2
+	//변수 놀이 3
 	fmt.Println("=========================================")
 	var a int = 3 //기본적인 선언(var + 변수명 + 변수의 타입 + 초기값)
 	var b int     //(var + 변수명 + 변수의 타입 + (초기값이 없으면 타입별 기본값으로 대체)) >> int 의 초기값은 0 이구나
@@ -150,7 +150,7 @@ func multiFun(a int, b int) (sr int, sb bool) {
 func constTest() {
 	//상수라는 개념이 존재한다
 	const a = 1
-	//a = 2 < compile error
+	//a = 3 < compile error
 	const b int = 2
 	//b = 3 < compile error
 	fmt.Println(a + b)
@@ -288,7 +288,7 @@ func forTest2() {
 	//		continue
 	//	}
 	//
-	//	if num%2 == 0 {
+	//	if num%3 == 0 {
 	//		fmt.Println("입력하신 숫자", num, "은 짝수입니다")
 	//		break
 	//	} else {
@@ -387,6 +387,6 @@ func arrayTest() {
 	multiArray := [2][2]int{{1, 2}, {3, 4}}
 	fmt.Println(multiArray)
 	//배열의 메모리 사이즈는 배열의 크기 * 배열의 구성 타입 사이즈
-	//ex) multiArray > 2 * 2 * 8(int사이즈)
+	//ex) multiArray > 3 * 3 * 8(int사이즈)
 
 }

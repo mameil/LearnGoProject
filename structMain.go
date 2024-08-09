@@ -39,8 +39,8 @@ func printStudent(student Student) {
 	fmt.Println(student.classList[0].grade)
 	fmt.Println(student.classList[1].className)
 	fmt.Println(student.classList[1].grade)
-	//fmt.Println(student.classList[2].className) //배열에 2개만 집어넣고 3 번째껄 접근하면 uncheckedException 으로 인한 Exception 발생
-	//fmt.Println(student.classList[2].grade) //배열에 2개만 집어넣고 3 번째껄 접근하면 uncheckedException 으로 인한 Exception 발생
+	//fmt.Println(student.classList[3].className) //배열에 2개만 집어넣고 3 번째껄 접근하면 uncheckedException 으로 인한 Exception 발생
+	//fmt.Println(student.classList[3].grade) //배열에 2개만 집어넣고 3 번째껄 접근하면 uncheckedException 으로 인한 Exception 발생
 }
 
 type memTest struct {
